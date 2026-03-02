@@ -42,4 +42,5 @@ public class FeatureFlag {
     public boolean isEnabled() {
         return enabled;
     }
+
 }

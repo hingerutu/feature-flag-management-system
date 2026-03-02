@@ -3,6 +3,7 @@ package com.example.featureflags.service;
 import com.example.featureflags.entity.FeatureFlag;
 import com.example.featureflags.repository.FeatureFlagRepository;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class FeatureFlagService {
@@ -26,6 +27,10 @@ public class FeatureFlagService {
 
         return flag.isEnabled();
     }
+    
+    public List<FeatureFlag> getAllFlags() {
+        return repository.findAll();
+    }
 
     public boolean toggleFeature(String featureName, String env, boolean enabled) {
         if(!env.equalsIgnoreCase("DEV") && !env.equalsIgnoreCase("PROD")) {
@@ -39,4 +44,16 @@ public class FeatureFlagService {
             
             return enabled;
     }
+
+    public FeatureFlag createFlag(String name, String env, boolean enabled) {
+
+        if(!env.equalsIgnoreCase("DEV") && !env.equalsIgnoreCase("PROD")) {
+            throw new IllegalArgumentException("Invalid environment");
+        }
+
+        FeatureFlag flag = new FeatureFlag(name, env.toUpperCase(), enabled);
+
+        return repository.save(flag);
+    }
+    
 }
