@@ -1,8 +1,11 @@
 package com.example.featureflags.service;
 
 import com.example.featureflags.entity.FeatureFlag;
+import com.example.featureflags.exception.ResourceNotFoundException;
+import com.example.featureflags.entity.Environment;
 import com.example.featureflags.repository.FeatureFlagRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -14,46 +17,40 @@ public class FeatureFlagService {
         this.repository = repository;
     }
 
-    public boolean isFeatureEnabled(String featureName, String env) {
-
-        if (!env.equalsIgnoreCase("DEV") && !env.equalsIgnoreCase("PROD")) {
-            throw new IllegalArgumentException("Invalid environment. Use DEV or PROD");
-        }
+    // ✅ Check if feature is enabled
+    public boolean isFeatureEnabled(String featureName, Environment env) {
 
         FeatureFlag flag = repository
                 .findByNameAndEnvironment(featureName, env)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Feature flag not found"));
+                        new ResourceNotFoundException("Feature flag not found"));
 
         return flag.isEnabled();
     }
-    
+
+    // ✅ Get all flags
     public List<FeatureFlag> getAllFlags() {
         return repository.findAll();
     }
 
-    public boolean toggleFeature(String featureName, String env, boolean enabled) {
-        if(!env.equalsIgnoreCase("DEV") && !env.equalsIgnoreCase("PROD")) {
-            throw new IllegalArgumentException("Inavalid environment. Use DEV or PROD.");
-        }
-            int updated = repository.updateFlag(featureName, env, enabled);
+    // ✅ Create new flag
+    public boolean toggleFeature(String featureName, Environment env) {
 
-            if(updated == 0) {
-                throw new IllegalArgumentException("Feature flag not found");
-            } 
-            
-            return enabled;
+        FeatureFlag flag = repository
+            .findByNameAndEnvironment(featureName, env)
+            .orElseThrow(() ->
+                    new IllegalArgumentException("Feature flag not found"));
+
+        boolean newValue = !flag.isEnabled(); // 🔥 flip value
+        flag.setEnabled(newValue);
+        repository.save(flag);
+        return newValue;
     }
 
-    public FeatureFlag createFlag(String name, String env, boolean enabled) {
+    public FeatureFlag createFlag(String name, Environment env, boolean enabled) {
 
-        if(!env.equalsIgnoreCase("DEV") && !env.equalsIgnoreCase("PROD")) {
-            throw new IllegalArgumentException("Invalid environment");
-        }
-
-        FeatureFlag flag = new FeatureFlag(name, env.toUpperCase(), enabled);
+        FeatureFlag flag = new FeatureFlag(name, env, enabled);
 
         return repository.save(flag);
-    }
-    
+    }   
 }

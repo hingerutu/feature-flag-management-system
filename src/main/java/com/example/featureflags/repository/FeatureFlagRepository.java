@@ -5,11 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import com.example.featureflags.entity.Environment;
 import org.springframework.transaction.annotation.Transactional;
 
 
 public interface FeatureFlagRepository extends JpaRepository<FeatureFlag, Long> {
-    Optional<FeatureFlag> findByNameAndEnvironment(String name, String environment);
+    Optional<FeatureFlag> findByNameAndEnvironment(String name, Environment environment);
     
     @Transactional
     @Modifying
@@ -18,5 +19,5 @@ public interface FeatureFlagRepository extends JpaRepository<FeatureFlag, Long> 
         set f.enabled = :enabled
         where f.name = :name and f.environment = :environment
     """)
-    int updateFlag(String name, String environment, boolean enabled);
+    int updateFlag(String name, Environment environment, boolean enabled);
 }

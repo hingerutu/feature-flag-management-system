@@ -12,8 +12,9 @@ public class FeatureFlag {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String environment;
+    private Environment environment;
 
     @Column(nullable = false)
     private boolean enabled;
@@ -21,13 +22,13 @@ public class FeatureFlag {
     protected FeatureFlag() {
     }
 
-    public FeatureFlag(String name, String environment, boolean enabled) {
+    public FeatureFlag(String name, Environment environment, boolean enabled) {
         this.name = name;
         this.environment = environment;
         this.enabled = enabled;
     }
 
-    public Long getID() {
+    public Long getId() {
         return id;
     }
 
@@ -35,12 +36,16 @@ public class FeatureFlag {
         return name;
     }
 
-    public String getEnvironment() {
+    public Environment getEnvironment() {
         return environment;
     }
 
     public boolean isEnabled() {
         return enabled;
     }
+
+    public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+}
 
 }
